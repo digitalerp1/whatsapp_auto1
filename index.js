@@ -5,16 +5,16 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Dummy HTTP Server Render ke liye taaki UptimeRobot isko jagakar rakhe
+// Render ke ping checks ke liye basic route
 app.get('/', (req, res) => {
-    res.send('WhatsApp Bot is Running Nano 24/7!');
+    res.send('WhatsApp Bot is Running perfectly via Docker!');
 });
 
 app.listen(port, () => {
     console.log(`Web server listening on port ${port}`);
 });
 
-// WhatsApp Client Setup with Chrome Flags for Render
+// WhatsApp Client configuration with aggressive flags to save RAM on free tier
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
@@ -26,31 +26,33 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--single-process', // RAM bachane ke liye
+            '--single-process', // RAM optimize karne ke liye
             '--disable-gpu'
         ],
-        // Render par Google Chrome ka default path yehi hota hai
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable'
+        // Docker image me Chrome isi path par install hota hai
+        executablePath: '/usr/bin/google-chrome-stable'
     }
 });
 
-// QR Code generation (Render ke Logs me dikhega)
+// Terminal logs me QR code print karne ke liye
 client.on('qr', (qr) => {
-    console.log('--- SCAN THIS QR CODE IN YOUR WHATSAPP ---');
+    console.log('================================================================');
+    console.log('👉 SCAN THIS QR CODE IN YOUR WHATSAPP TO LINK THE BOT 👈');
+    console.log('================================================================');
     qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
-    console.log('WhatsApp Client is ready and connected!');
+    console.log('🚀 SUCCESS: WhatsApp Client is ready and connected!');
 });
 
-// Ek simple Auto-Reply Command testing ke liye
+// Basic Auto-Reply logic
 client.on('message', async (msg) => {
     if (msg.body.toLowerCase() === 'ping') {
         await msg.reply('pong');
     }
     if (msg.body.toLowerCase() === 'hello') {
-        await msg.reply('Hi! Main Render Cloud Server se bol raha hoon. Bot successfully active hai! Bot powered by My Zini.');
+        await msg.reply('Hi! Main Render Cloud Server (Docker Env) se bol raha hoon. System online hai!');
     }
 });
 
